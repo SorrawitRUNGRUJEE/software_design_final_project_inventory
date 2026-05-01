@@ -8,17 +8,17 @@ import {
   Query,
   HttpCode,
   HttpStatus,
-} from '@nestjs/common';
-import { PropertyService } from './property.service';
+} from "@nestjs/common";
+import { PropertyService } from "./property.service";
 import {
   CreatePropertyDto,
   ExaminationDto,
   SettlePriceDto,
   FinalizePropertyDto,
   DefectReportDto,
-} from './dto/property.dto';
+} from "./dto/property.dto";
 
-@Controller('api/v1')
+@Controller("api/v1")
 export class PropertyController {
   constructor(private readonly propertyService: PropertyService) {}
 
@@ -30,7 +30,7 @@ export class PropertyController {
    * GET /api/v1/properties/surveyed
    * FE Step 1 list: properties from CEO that are awaiting inspection.
    */
-  @Get('properties/surveyed')
+  @Get("properties/surveyed")
   async getSurveyedProperties() {
     return this.propertyService.getSurveyedProperties();
   }
@@ -40,7 +40,7 @@ export class PropertyController {
    * FE Step 2 list: properties whose purchase has been confirmed,
    * waiting for property details to be filled in.
    */
-  @Get('properties/bought')
+  @Get("properties/bought")
   async getBoughtProperties() {
     return this.propertyService.getBoughtProperties();
   }
@@ -50,7 +50,7 @@ export class PropertyController {
    * FE Step 3 list: properties whose details are filled in,
    * waiting for price negotiation.
    */
-  @Get('properties/registered')
+  @Get("properties/registered")
   async getRegisteredProperties() {
     return this.propertyService.getRegisteredProperties();
   }
@@ -60,7 +60,7 @@ export class PropertyController {
    * FE Step 4 list: properties whose price is settled,
    * waiting for finalization.
    */
-  @Get('properties/price-settled')
+  @Get("properties/price-settled")
   async getPriceSettledProperties() {
     return this.propertyService.getPriceSettledProperties();
   }
@@ -74,10 +74,10 @@ export class PropertyController {
    * Submit inspection result with 4 pass/fail categories.
    * → publishes inventory.property.examined to CEO
    */
-  @Post('properties/:id/examination')
+  @Post("properties/:id/examination")
   @HttpCode(HttpStatus.CREATED)
   async submitExamination(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() dto: ExaminationDto,
   ) {
     return this.propertyService.submitExamination(id, dto);
@@ -88,7 +88,7 @@ export class PropertyController {
    * Inventory team fills in property details after purchase.
    * → publishes inventory.property.registered to Sales
    */
-  @Post('properties')
+  @Post("properties")
   @HttpCode(HttpStatus.CREATED)
   async registerProperty(@Body() dto: CreatePropertyDto) {
     return this.propertyService.registerProperty(dto);
@@ -99,11 +99,8 @@ export class PropertyController {
    * Inventory finalizes the agreed price.
    * → publishes inventory.price.settled to Marketing & CEO
    */
-  @Put('properties/:id/price')
-  async settlePrice(
-    @Param('id') id: string,
-    @Body() dto: SettlePriceDto,
-  ) {
+  @Put("properties/:id/price")
+  async settlePrice(@Param("id") id: string, @Body() dto: SettlePriceDto) {
     return this.propertyService.settlePrice(id, dto);
   }
 
@@ -113,10 +110,10 @@ export class PropertyController {
    * → publishes inventory.property.finalized to Sales
    * → status becomes AVAILABLE
    */
-  @Post('properties/:id/finalize')
+  @Post("properties/:id/finalize")
   @HttpCode(HttpStatus.CREATED)
   async finalizeProperty(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() dto: FinalizePropertyDto,
   ) {
     return this.propertyService.finalizeProperty(id, dto);
@@ -126,7 +123,7 @@ export class PropertyController {
    * POST /api/v1/defects (Flow 4)
    * Receives defect report and publishes to Post-Sale.
    */
-  @Post('defects')
+  @Post("defects")
   @HttpCode(HttpStatus.CREATED)
   async reportDefect(@Body() dto: DefectReportDto) {
     return this.propertyService.reportDefect(dto);
@@ -136,33 +133,38 @@ export class PropertyController {
   // GET — outbound to other teams
   // ============================================================
 
-  @Get('properties')
-  async getProperties(@Query('status') status?: string) {
+  @Get("properties")
+  async getProperties(@Query("status") status?: string) {
     return this.propertyService.getProperties(status);
   }
 
-  @Get('properties/:id')
-  async getPropertyById(@Param('id') id: string) {
+  @Get("properties/:id")
+  async getPropertyById(@Param("id") id: string) {
     return this.propertyService.getPropertyById(id);
   }
 
-  @Get('properties/:id/status')
-  async getPropertyStatus(@Param('id') id: string) {
+  @Get("properties/:id/status")
+  async getPropertyStatus(@Param("id") id: string) {
     return this.propertyService.getPropertyStatus(id);
   }
 
-  @Get('properties/:id/price')
-  async getPropertyPrice(@Param('id') id: string) {
+  @Get("properties/:id/price")
+  async getPropertyPrice(@Param("id") id: string) {
     return this.propertyService.getPropertyPrice(id);
   }
 
-  @Get('properties/:id/inspection')
-  async getPropertyInspection(@Param('id') id: string) {
+  @Get("properties/:id/inspection")
+  async getPropertyInspection(@Param("id") id: string) {
     return this.propertyService.getPropertyInspection(id);
   }
 
-  @Get('properties/:id/history')
-  async getPropertyHistory(@Param('id') id: string) {
+  @Get("properties/:id/history")
+  async getPropertyHistory(@Param("id") id: string) {
     return this.propertyService.getPropertyHistory(id);
+  }
+
+  @Get("/health")
+  healthCheck() {
+    return { status: "UP", service: "inventory-catalog-service" };
   }
 }
